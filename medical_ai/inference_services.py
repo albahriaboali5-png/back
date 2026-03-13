@@ -32,12 +32,6 @@ class AIInferenceService:
             from .models import SystemSetting
             
             try:
-                setting = SystemSetting.objects.get(key="OPENAI_API_KEY")
-                openai_key = setting.value
-            except SystemSetting.DoesNotExist:
-                openai_key = os.getenv("OPENAI_API_KEY")
-
-            try:
                 setting2 = SystemSetting.objects.get(key="GEMINI_API_KEY")
                 gemini_key = setting2.value
             except SystemSetting.DoesNotExist:
@@ -57,25 +51,6 @@ class AIInferenceService:
             خبير طبي متعاطف ومهني. استخدم العربية الفصحى المبسطة.
             """
 
-            # محاولة تهيئة OpenAI أولاً لأنه أقوى (حسب طلب المستخدم)
-            if openai_key and openai_key.strip():
-                # قراءة base_url من الإعدادات لدعم DeepSeek أو أي واجهة متوافقة (OpenAI-compatible)
-                try:
-                    base_url_setting = SystemSetting.objects.get(key="OPENAI_BASE_URL")
-                    base_url = base_url_setting.value.strip() or None
-                except SystemSetting.DoesNotExist:
-                    base_url = os.getenv("OPENAI_BASE_URL") or None
-                
-                self._openai_client = OpenAI(
-                    api_key=openai_key.strip(),
-                    base_url=base_url  # None = يستخدم OpenAI الافتراضي، أي رابط آخر = DeepSeek أو غيره
-                )
-                self.ai_provider = "openai"
-                provider_name = base_url if base_url else "OpenAI (Default)"
-                print(f"DEBUG SERVICE: OpenAI-Compatible Client enabled -> {provider_name}")
-                return
-
-            # في حال عدم وجود OpenAI، نعود لاحتياطي Gemini
             if gemini_key and gemini_key.strip():
                 self._client = genai.Client(api_key=gemini_key.strip())
                 self.ai_provider = "gemini"
@@ -98,10 +73,10 @@ class AIInferenceService:
                 except Exception as e:
                     print(f"Warning: Could not list models for auto-selection, using default. Error: {e}")
                 
-                print("DEBUG SERVICE: Gemini SDK Client initialized as Fallback.")
+                print("DEBUG SERVICE: Gemini SDK Client initialized.")
                 return
 
-            print("WARNING: Neither OPENAI_API_KEY nor GEMINI_API_KEY were found. AI features will be disabled.")
+            print("WARNING: GEMINI_API_KEY was not found. AI features will be disabled.")
             
         except Exception as e:
             print(f"Error initializing AI Clients: {e}")
