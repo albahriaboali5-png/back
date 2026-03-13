@@ -1,0 +1,8 @@
+#!/bin/bash
+python manage.py makemigrations
+# Apply database migrations
+python manage.py migrate
+# Create default admin if not exists
+python create_admin.py
+# Start Gunicorn with a higher timeout for AI processing
+gunicorn mas_project.wsgi --bind 0.0.0.0:$PORT --timeout 120
