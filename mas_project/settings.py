@@ -148,7 +148,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://mm-production-48d3.up.railway.app',
-    'http://mm-production-48d3.up.railway.app',
+    'https://back-production-3015.up.railway.app',
 ]
+
 
